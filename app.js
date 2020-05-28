@@ -1,4 +1,4 @@
-//These will all be iffe's. Immediately invoked function expressions. wrap
+//These will all be iife's. Immediately invoked function expressions. wrap
 //in parenthesis and invoke at the end of the function w/extra () 
 //Will run automatically when the program runs
 
@@ -28,6 +28,31 @@ const ItemCtrl = (function() {
   }
   //Public methods
   return {  
+    getItems: function() {   //function to return the items above
+      return data.items
+    },
+
+    //add items
+    addItem: function(name, calories) {
+      //create id
+      if(data.items.length > 0) {
+        ID = data.items[data.items.length - 1].id + 1
+      } else {
+        ID = 0
+      }
+
+      //calories to number
+      calories = parseInt(calories);
+
+      //Create new item
+      newItem = new Item(ID, name, calories);
+
+      //add item to items array
+      data.items.push(newItem);
+
+      return newItem
+    },    
+
     logData: function() {
       return data
     }
@@ -36,9 +61,42 @@ const ItemCtrl = (function() {
 
 //UI Controller
 const UICtrl = (function() {
+  //keep all UI selectors together incase they change
+  const UISelectors = {
+    itemList: '#item-list',
+    addBtn: '.add-btn',
+    itemNameInput: '#item-name',
+    itemCaloriesInput: '#item-calories'
+  }
 
   //Public methods
   return {
+    populateItemList: function(items) {
+      let html = '';
+
+      items.forEach(function(item) {
+        html += `<li class="collection-item" id="item-${item.id}">
+        <strong>${item.name}:</strong> <em>${item.calories} Calories</em>
+        <a href="#" class="secondary-content">
+          <i class="edit-item fa fa-pencil"></i>
+        </a>
+      </li>`
+      })
+
+      //insert list items
+      document.querySelector(UISelectors.itemList).innerHTML = html;
+    },
+    //get input from form
+    getItemInput: function() {
+      return {
+        name: document.querySelector(UISelectors.itemNameInput).value,
+        calories: document.querySelector(UISelectors.itemCaloriesInput).value
+      }
+    },
+
+    getSelectors: function() {
+      return UISelectors;
+    }
 
   }
   
@@ -46,12 +104,40 @@ const UICtrl = (function() {
 
 //App Controller- This is the main controller. pass in the ItemCtrl & UICtrl
 const App = (function(ItemCtrl, UICtrl) {
-  //console.log(ItemCtrl.logData())
+  //Load event listeners
+  const loadEventListeners = function() {
+    const UISelectors = UICtrl.getSelectors();
+
+    //Add item event
+    document.querySelector(UISelectors.addBtn).addEventListener
+    ('click', itemAddSubmit);
+  }
+
+  //add event submit
+  const itemAddSubmit = function(e) {
+   //get form input from UI controller
+   const input = UICtrl.getItemInput();
+    
+   //ck for name & calories
+   if(input.name !== '' && input.calories !== ''){
+ // add item
+    const newItem = ItemCtrl.addItem(input.name, input.calories)
+   }
+    e.preventDefault();
+  }
 
   //Public methods
   return {
     init: function() {
-      console.log('initializing app...')
+      //Fetch items from data structure
+      const items = ItemCtrl.getItems();
+
+      //Populate list with items
+      UICtrl.populateItemList(items)
+
+      //load event listeners
+      loadEventListeners()
+      
     }
   }
   
