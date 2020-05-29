@@ -204,7 +204,7 @@ const App = (function(ItemCtrl, UICtrl) {
 
   //Edit icon click event
   document.querySelector(UISelectors.itemList).addEventListener
-  ('click', itemUpdateSubmit);
+  ('click', itemEditClick);
   }
 
   //add item submit
@@ -233,7 +233,7 @@ const App = (function(ItemCtrl, UICtrl) {
   }
 
   //update item submit
-  const itemUpdateSubmit = function(e) {
+  const itemEditClick = function(e) {
     if(e.target.classList.contains('edit-item')) {
       //get list item id (item: item-)
       const listId = e.target.parentNode.parentNode.id;
