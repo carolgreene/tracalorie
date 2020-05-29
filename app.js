@@ -19,9 +19,9 @@ const ItemCtrl = (function() {
   //ItemCtrl.data is not accessible, but ItemCtrl.logData() is
   const data = {           //this is like react state
     items: [
-      {id: 0, name: 'Steak Dinner', calories: 1200,},  //show some test data
-      {id: 1, name: 'Cookies', calories: 400,},
-      {id: 2, name: 'Eggs', calories: 300,}
+      //{id: 0, name: 'Steak Dinner', calories: 1200,},  //show some test data
+      //{id: 1, name: 'Cookies', calories: 400,},
+      //{id: 2, name: 'Eggs', calories: 300,}
     ],
     currentItem: null,
     totalCalories: 0
@@ -72,8 +72,8 @@ const UICtrl = (function() {
   //Public methods
   return {
     populateItemList: function(items) {
-      let html = '';
-
+      let html = ''
+      
       items.forEach(function(item) {
         html += `<li class="collection-item" id="item-${item.id}">
         <strong>${item.name}:</strong> <em>${item.calories} Calories</em>
@@ -94,12 +94,39 @@ const UICtrl = (function() {
       }
     },
 
+    addListItem: function(item) {
+      //Show the list
+      document.querySelector(UISelectors.itemList).style.display = 'block';
+      //create li element
+      const li = document.createElement('li')
+      //add class
+      li.className = 'collection-item';
+      //add id
+      li.id = `item-${item.id}`   //re-watch this to see why we do item-
+
+      //add HTML
+      li.innerHTML = `
+      <strong>${item.name}:</strong> <em>${item.calories} Calories</em>
+        <a href="#" class="secondary-content">
+          <i class="edit-item fa fa-pencil"></i>
+        </a>`
+        // Insert item
+        document.querySelector(UISelectors.itemList).insertAdjacentElement('beforeend', li)
+    },
+
+    clearInput: function() {
+      document.querySelector(UISelectors.itemNameInput).value = '';
+      document.querySelector(UISelectors.itemCaloriesInput).value = '';
+    },
+
+    hideList: function() {
+      document.querySelector(UISelectors.itemList).style.display = 'none';
+    },    
+
     getSelectors: function() {
       return UISelectors;
     }
-
-  }
-  
+  }  
 })();
 
 //App Controller- This is the main controller. pass in the ItemCtrl & UICtrl
@@ -122,6 +149,11 @@ const App = (function(ItemCtrl, UICtrl) {
    if(input.name !== '' && input.calories !== ''){
  // add item
     const newItem = ItemCtrl.addItem(input.name, input.calories)
+    //Add item to UI list
+    UICtrl.addListItem(newItem);
+
+    //Clear Fields
+    UICtrl.clearInput();
    }
     e.preventDefault();
   }
@@ -132,8 +164,15 @@ const App = (function(ItemCtrl, UICtrl) {
       //Fetch items from data structure
       const items = ItemCtrl.getItems();
 
-      //Populate list with items
+      //check if any items
+      if(items.length === 0) {
+        UICtrl.hideList();
+      } else {
+        //Populate list with items
       UICtrl.populateItemList(items)
+      }
+
+      
 
       //load event listeners
       loadEventListeners()
