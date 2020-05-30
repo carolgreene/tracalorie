@@ -8,7 +8,7 @@ const StorageCtrl = (function() {
   return {
     //Public methods
     storeItem: function(item) {
-      let items = [];
+      let items;
       //ck if any items in local storage
       if(localStorage.getItem('items') === null) {
         items = [];
@@ -20,11 +20,22 @@ const StorageCtrl = (function() {
         //must take the string & parse back into array
         items = JSON.parse(localStorage.getItem('items'));
 
-        //push the new item & put everything back in local storage
+        //push the new item 
         items.push(item);
+
+        //& put everything back in local storage
         localStorage.setItem('items', JSON.stringify(items))
       }
+    },
 
+    getItemsFromStorage: function() {
+      let items;
+      if(localStorage.getItem('items') === null){
+        items = [];
+      } else {
+        items = JSON.parse(localStorage.getItem('items'));
+      }
+      return items
     }
   }
 })()
@@ -47,11 +58,12 @@ const ItemCtrl = (function() {
   //ie from the browser. If you want it to have public access, must be returned
   //ItemCtrl.data is not accessible, but ItemCtrl.logData() is
   const data = {           //this is like react state
-    items: [
+    //items: [
       //{id: 0, name: 'Steak Dinner', calories: 1200,},  //show some test data
       //{id: 1, name: 'Cookies', calories: 400,},
       //{id: 2, name: 'Eggs', calories: 300,}
-    ],
+    //],
+    items: StorageCtrl.getItemsFromStorage(),
     currentItem: null,
     totalCalories: 0
   }
