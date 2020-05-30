@@ -2,9 +2,14 @@
 //in parenthesis and invoke at the end of the function w/extra () 
 //Will run automatically when the program runs
 
-//Storage Controller
+//-----------------STORAGE CONTROLLELR-----------------------------------------------
 
-//Item Controller
+
+
+
+//----------------------ITEM CONTROLLER------------------------------------------------
+
+
 const ItemCtrl = (function() {
   //Item constructor
   const Item = function(id, name, calories) {
@@ -107,7 +112,12 @@ const ItemCtrl = (function() {
   }
 })();
 
-//UI Controller
+
+
+
+//----------------UI CONTROLLER-----------------------------------------------------------------------
+
+
 const UICtrl = (function() {
   //keep all UI selectors together incase they change
   const UISelectors = {
@@ -213,7 +223,7 @@ const UICtrl = (function() {
       document.querySelector(UISelectors.backBtn).style.display = 'none';
       document.querySelector(UISelectors.addBtn).style.display = 'inline';
     },
-
+ 
     showEditState: function() {
       document.querySelector(UISelectors.updateBtn).style.display = 'inline';
       document.querySelector(UISelectors.deleteBtn).style.display = 'inline';
@@ -227,7 +237,14 @@ const UICtrl = (function() {
   }  
 })();
 
-//App Controller- This is the main controller. pass in the ItemCtrl & UICtrl
+
+
+
+
+
+//------------------APP CONTROLLER---------------------------------------------------------
+//This is the main controller. pass in the ItemCtrl & UICtrl
+
 const App = (function(ItemCtrl, UICtrl) {
   //Load event listeners
   const loadEventListeners = function() {
@@ -237,47 +254,54 @@ const App = (function(ItemCtrl, UICtrl) {
     document.querySelector(UISelectors.addBtn).addEventListener
     ('click', itemAddSubmit);  
 
-  //Edit icon click event
-  document.querySelector(UISelectors.itemList).addEventListener
-  ('click', itemEditClick);
+    //Disable submit on enter- use this is bc if you hit enter when you're in edit mode
+   //it adds it to the meal list. (could also put this in a function & only call it when in edit)
+   document.addEventListener('keypress', function(e) {
+    if(e.keyCode === 13 || e.which === 13){
+      e.preventDefault();
+      return false;
+    }
+   })
 
-  //Update item event
-  document.querySelector(UISelectors.updateBtn).addEventListener
-  ('click', itemUpdateSubmit);
+    //Edit icon click event
+    document.querySelector(UISelectors.itemList).addEventListener
+    ('click', itemEditClick);
+
+    //Update item event
+    document.querySelector(UISelectors.updateBtn).addEventListener
+    ('click', itemUpdateSubmit);
+
+    //Back Button event
+    document.querySelector(UISelectors.backBtn).addEventListener
+    ('click', function (e) {      
+      UICtrl.clearEditState()
+      e.preventDefault()
+    })    
   }
 
   //add item submit
   const itemAddSubmit = function(e) {
    //get form input from UI controller
-   const input = UICtrl.getItemInput();
-
-   //Disable submit on enter- use this is bc if you hit enter when you're in edit mode
-   //it adds it to the meal list. (could also put this in a function & only call it when in edit)
-   document.addEventListener('keypress', function(e) {
-     if(e.keyCode === 13 || e.which === 13){
-       e.preventDefault();
-       return false;
-     }
-   })
+   const input = UICtrl.getItemInput();   
     
    //ck for name & calories
    if(input.name !== '' && input.calories !== ''){
- // add item
-    const newItem = ItemCtrl.addItem(input.name, input.calories)
+     // add item
+     const newItem = ItemCtrl.addItem(input.name, input.calories)
 
-    //Add item to UI list
-    UICtrl.addListItem(newItem);
+     //Add item to UI list
+     UICtrl.addListItem(newItem);
 
-    //Get total calories
-    const totalCalories = ItemCtrl.getTotalCalories();
+     //Get total calories
+     const totalCalories = ItemCtrl.getTotalCalories();
 
-    //Add total calories to UI
-    UICtrl.showTotalCalories(totalCalories);
+     //Add total calories to UI
+     UICtrl.showTotalCalories(totalCalories);
 
-    //Clear Fields
-    UICtrl.clearInput();
+     //Clear Fields
+     UICtrl.clearInput();
    }
-    e.preventDefault();
+     e.preventDefault();
   }
 
   //click edit item 
@@ -344,17 +368,16 @@ const App = (function(ItemCtrl, UICtrl) {
       //Get total calories
       const totalCalories = ItemCtrl.getTotalCalories();
       //Add total calories to UI
-      UICtrl.showTotalCalories(totalCalories);
-
-      
+      UICtrl.showTotalCalories(totalCalories);      
 
       //load event listeners
       loadEventListeners()
       
     }
-  }
-  
+  }  
 })(ItemCtrl, UICtrl);
 
 //Initialize app- call init function
 App.init();
+
+
