@@ -275,8 +275,8 @@ const App = (function(ItemCtrl, UICtrl) {
     document.querySelector(UISelectors.backBtn).addEventListener
     ('click', function (e) {      
       UICtrl.clearEditState()
-      e.preventDefault()
-    })    
+      //e.preventDefault()            to keep pg from refreshing, either preventDefault() or give the button a type="button"
+    })                               //I gave the button a type. Otherwise it assumes it's a submit
   }
 
   //add item submit
