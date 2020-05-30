@@ -85,6 +85,24 @@ const ItemCtrl = (function() {
       return found
     },
 
+    deleteItem: function(id) {
+      //get ids
+      const ids = data.items.map(function(item) {
+        return item.id;
+      })
+
+      //get index
+      const index = ids.indexOf(id);
+
+      //Remove item
+      data.items.splice(index,1);
+    },
+
+    //clear all items
+    clearAllItems: function() {
+      data.items = [];
+    },
+
     setCurrentItem: function(item) {
       data.currentItem = item;
     },
@@ -127,6 +145,7 @@ const UICtrl = (function() {
     updateBtn: '.update-btn',
     deleteBtn: '.delete-btn',
     backBtn: '.back-btn',
+    clearBtn: '.clear-btn',
     itemNameInput: '#item-name',
     itemCaloriesInput: '#item-calories',
     totalCalories: '.total-calories'
@@ -195,6 +214,12 @@ const UICtrl = (function() {
       })
     },
 
+    deleteListItem: function(id) {
+      const itemID = `#item-${id}`;
+      const item = document.querySelector(itemID);
+      item.remove();
+    },
+
     clearInput: function() {
       document.querySelector(UISelectors.itemNameInput).value = '';
       document.querySelector(UISelectors.itemCaloriesInput).value = '';
@@ -206,6 +231,17 @@ const UICtrl = (function() {
       document.querySelector(UISelectors.itemCaloriesInput).value = 
       ItemCtrl.getCurrentItem().calories;
       UICtrl.showEditState();
+    },
+
+    removeItems: function() {
+      let listItems = document.querySelectorAll(UISelectors.listItems);
+
+      //Turn node list into Array
+      listItems = Array.from(listItems);
+
+      listItems.forEach(function(item) {
+        item.remove();
+      })
     },
 
     hideList: function() {
@@ -271,12 +307,20 @@ const App = (function(ItemCtrl, UICtrl) {
     document.querySelector(UISelectors.updateBtn).addEventListener
     ('click', itemUpdateSubmit);
 
+    //Update item event
+    document.querySelector(UISelectors.deleteBtn).addEventListener
+    ('click', itemDeleteSubmit);
+
     //Back Button event
     document.querySelector(UISelectors.backBtn).addEventListener
     ('click', function (e) {      
       UICtrl.clearEditState()
       //e.preventDefault()            to keep pg from refreshing, either preventDefault() or give the button a type="button"
     })                               //I gave the button a type. Otherwise it assumes it's a submit
+
+    //Clear items event
+    document.querySelector(UISelectors.clearBtn).addEventListener
+    ('click', clearAllItemsClick);
   }
 
   //add item submit
@@ -348,6 +392,47 @@ const App = (function(ItemCtrl, UICtrl) {
 
     e.preventDefault()
   }
+
+  //Delete button event
+  const itemDeleteSubmit = function(e) {
+    //get current item
+    const currentItem = ItemCtrl.getCurrentItem();
+
+    //delete from data structure
+    ItemCtrl.deleteItem(currentItem.id)
+
+    //delete from UI
+    UICtrl.deleteListItem(currentItem.id);
+
+    //Get total calories
+    const totalCalories = ItemCtrl.getTotalCalories();
+    //Add total calories to UI
+    UICtrl.showTotalCalories(totalCalories);
+
+    UICtrl.clearEditState();
+
+    e.preventDefault()    
+  }
+
+  //Clear items event
+  const clearAllItemsClick = function() {
+    //Delete all items from data structure
+    ItemCtrl.clearAllItems();
+
+    //Get total calories
+    const totalCalories = ItemCtrl.getTotalCalories();
+    //Add total calories to UI
+    UICtrl.showTotalCalories(totalCalories);
+
+    //Remove all items from UI
+    UICtrl.removeItems()
+
+    //hide the ul
+    UICtrl.hideList();
+  }
+
+  
+
 
   //Public methods
   return {
